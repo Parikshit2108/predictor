@@ -13,10 +13,12 @@ st.set_page_config(page_title="NIFTY 50 AI Prediction Dashboard", layout="wide")
 # --- Function: Calculate RSI ---
 def compute_rsi(data, window=14):
     delta = data['Close'].diff()
-    gain = np.where(delta > 0, delta, 0)
-    loss = np.where(delta < 0, -delta, 0)
-    avg_gain = pd.Series(gain).rolling(window).mean()
-    avg_loss = pd.Series(loss).rolling(window).mean()
+    gain = delta.where(delta > 0, 0)
+    loss = -delta.where(delta < 0, 0)
+
+    avg_gain = gain.rolling(window=window).mean()
+    avg_loss = loss.rolling(window=window).mean()
+
     rs = avg_gain / avg_loss
     rsi = 100 - (100 / (1 + rs))
     return rsi
